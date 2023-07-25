@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/golang-jwt/jwt/v4"
 )
 
 func (app *application) Home(w http.ResponseWriter, r *http.Request) {
@@ -104,10 +103,10 @@ func (app *application) refreshToken(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			u := jwtUser {
-				ID: user.ID,
+			u := jwtUser{
+				ID:        user.ID,
 				FirstName: user.FirstName,
-				LastName: user.LastName,
+				LastName:  user.LastName,
 			}
 
 			tokenPairs, err := app.auth.GenerateTokenPair(&u)
@@ -121,4 +120,9 @@ func (app *application) refreshToken(w http.ResponseWriter, r *http.Request) {
 			app.writeJSON(w, http.StatusOK, tokenPairs)
 		}
 	}
+}
+
+func (app *application) logout(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, app.auth.GetExpiredRefreshCookie())
+	w.WriteHeader(http.StatusAccepted)
 }
