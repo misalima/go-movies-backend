@@ -52,7 +52,7 @@ func main() {
 		TokenExpiry:   time.Minute * 15,
 		RefreshExpiry: time.Hour * 24,
 		CookiePath:    "/",
-		CookieName:    "__Rrefresh-token",
+		CookieName:    "__Refresh-token",
 		CookieDomain:  app.CookieDomain,
 	}
 	// start a web server
