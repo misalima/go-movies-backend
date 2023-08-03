@@ -39,7 +39,7 @@ func (m *PostgresDBRepo) AllMovies() ([]*models.Movie, error) {
 	for rows.Next() {
 		var movie models.Movie
 		err := rows.Scan(
-			&movie.ID, 
+			&movie.ID,
 			&movie.Title,
 			&movie.ReleaseDate,
 			&movie.RunTime,
@@ -111,7 +111,7 @@ func (m *PostgresDBRepo) OneMovie(id int) (*models.Movie, error) {
 			return nil, err
 		}
 
-		genres= append(genres, &g)
+		genres = append(genres, &g)
 	}
 
 	movie.Genres = genres
@@ -173,7 +173,7 @@ func (m *PostgresDBRepo) OneMovieForEdit(id int) (*models.Movie, []*models.Genre
 			return nil, nil, err
 		}
 
-		genres= append(genres, &g)
+		genres = append(genres, &g)
 		genresArray = append(genresArray, g.ID)
 	}
 
@@ -182,7 +182,7 @@ func (m *PostgresDBRepo) OneMovieForEdit(id int) (*models.Movie, []*models.Genre
 
 	var allGenres []*models.Genre
 
-	query = "select id, genre, from genres order by genre"
+	query = "select id, genre from genres order by genre"
 	gRows, err := m.DB.QueryContext(ctx, query)
 	if err != nil {
 		return nil, nil, err
@@ -205,7 +205,6 @@ func (m *PostgresDBRepo) OneMovieForEdit(id int) (*models.Movie, []*models.Genre
 	return &movie, allGenres, err
 
 }
-
 
 func (m *PostgresDBRepo) GetUserByEmail(email string) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
@@ -261,3 +260,34 @@ func (m *PostgresDBRepo) GetUserByID(id int) (*models.User, error) {
 	return &user, nil
 }
 
+func (m *PostgresDBRepo) AllGenres() ([]*models.Genre, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `select id, genre, created_at, updated_at from genres order by genre`
+
+	rows, err := m.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var genres []*models.Genre
+
+	for rows.Next() {
+		var g models.Genre
+		err := rows.Scan(
+			&g.ID,
+			&g.Genre,
+			&g.CreatedAt,
+			&g.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		genres = append(genres, &g)
+	}
+
+	return genres, nil
+}
